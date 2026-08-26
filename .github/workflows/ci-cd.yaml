@@ -1,0 +1,19 @@
+name: to-do
+
+on:
+    push:
+        branches:
+            - "main"
+            - "master"
+
+jobs:
+    test_and_build:
+        name: test_and_build
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: clone_code
+              uses: actions/checkout@v5
+
+            - name: build docker image
+              run: docker build -t getting-started-app .
