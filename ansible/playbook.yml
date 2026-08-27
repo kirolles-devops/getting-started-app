@@ -35,19 +35,18 @@
         force: yes
       become_user: ubuntu
 
+    # Docker commands run as root (become: yes at play level)
+    # because the ubuntu docker group change needs a new session to take effect
     - name: Stop old container if running
       shell: docker stop getting-started-app || true
-      become_user: ubuntu
 
     - name: Remove old container if exists
       shell: docker rm getting-started-app || true
-      become_user: ubuntu
 
     - name: Build Docker image
       shell: docker build -t getting-started-app .
       args:
         chdir: /home/ubuntu/getting-started-app
-      become_user: ubuntu
 
     - name: Run application container
       shell: |
@@ -56,5 +55,3 @@
           --restart always \
           -p 3000:3000 \
           getting-started-app
-      become_user: ubuntu
-
