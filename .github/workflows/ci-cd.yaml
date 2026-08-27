@@ -71,6 +71,7 @@ jobs:
               working-directory: terraform
               run: |
                 EC2_IP=$(terraform output -raw ec2_public_ip)
+                echo "EC2 Public IP: $EC2_IP"
                 echo "ec2_ip=$EC2_IP" >> $GITHUB_OUTPUT
 
 
