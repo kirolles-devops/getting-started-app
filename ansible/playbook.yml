@@ -1,0 +1,60 @@
+---
+- hosts: ec2
+  become: yes
+
+  tasks:
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install Docker and Git
+      apt:
+        name:
+          - docker.io
+          - git
+        state: present
+
+    - name: Start and enable Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add ubuntu user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Clone application from GitHub
+      git:
+        repo: "{{ repo_url }}"
+        dest: /home/ubuntu/getting-started-app
+        version: main
+        force: yes
+      become_user: ubuntu
+
+    - name: Stop old container if running
+      shell: docker stop getting-started-app || true
+      become_user: ubuntu
+
+    - name: Remove old container if exists
+      shell: docker rm getting-started-app || true
+      become_user: ubuntu
+
+    - name: Build Docker image
+      shell: docker build -t getting-started-app .
+      args:
+        chdir: /home/ubuntu/getting-started-app
+      become_user: ubuntu
+
+    - name: Run application container
+      shell: |
+        docker run -d \
+          --name getting-started-app \
+          --restart always \
+          -p 3000:3000 \
+          getting-started-app
+      become_user: ubuntu
+
