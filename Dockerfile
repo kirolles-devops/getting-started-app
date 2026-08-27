@@ -8,6 +8,9 @@ RUN npm ci --omit=dev
 
 COPY . .
 
+# Create the todos directory and give the node user permission to write to it
+RUN mkdir -p /etc/todos && chown -R node:node /etc/todos
+
 USER node
 
 CMD ["node", "src/index.js"]
